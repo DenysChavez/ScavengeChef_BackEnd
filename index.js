@@ -3,7 +3,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const mongoose = require("mongoose");
-const Recipe = require('./models/recipe')
+const Recipe = require('./models/recipe');
 
 const requestLogger = (request, response, next) => {
   console.log("Method:", request.method);
@@ -210,10 +210,6 @@ const generateId = () => {
   return maxId + 1;
 };
 
-// app.get("/", (request, response) => {
-//   response.send("<h1>Hello Micho! This is the BackEnd for Scavenge Chef</h1>");
-// });
-
 app.get("/info", (request, response) => {
   response.send(`
     <p>Recipe DataBase has ${recipes.length} recipes and ${
@@ -223,22 +219,19 @@ app.get("/info", (request, response) => {
     <p>${new Date()}</p>`);
 });
 
-//   RECIPES
+//   GET ALL RECIPES
 app.get("/api/recipes", (request, response) => {
   Recipe.find({}).then(recipes => {
     response.json(recipes)
   })
 });
 
+// FETCH AN INDIVIDUAL RECIPE
 app.get("/api/recipes/:id", (request, response) => {
-  const id = Number(request.params.id);
-  const recipe = recipes.find((recipe) => recipe.id === id);
+  Recipe.findById(request.params.id).then(recipe => {
+    response.json(recipe)
+  })
 
-  if (recipe) {
-    response.json(recipe);
-  } else {
-    response.status(404).end();
-  }
 });
 
 app.delete("/api/recipes/:id", (request, response) => {
@@ -247,6 +240,7 @@ app.delete("/api/recipes/:id", (request, response) => {
   response.status(204).end();
 });
 
+// POST
 app.post("/api/recipes", (request, response) => {
   const body = request.body;
 
@@ -256,18 +250,19 @@ app.post("/api/recipes", (request, response) => {
     });
   }
 
-  const recipe = {
-    id: generateId(),
+  const recipe = new Recipe({
     name: body.name,
     ingredients: body.ingredients,
     instructions: body.instructions,
     category: body.category,
     image: body.image,
     like: false,
-  };
+  })
 
-  recipes = recipes.concat(recipe);
-  response.json(recipe);
+  recipe.save().then(savedRecipe => {
+    response.json(savedRecipe);
+
+  })
 });
 
 app.delete("/api/recipes/:id", (request, response) => {
