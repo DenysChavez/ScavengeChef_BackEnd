@@ -9,7 +9,7 @@ console.log("connecting to", url);
 
 mongoose
   .connect(url)
-  .then((result) => {
+  .then(() => {
     console.log("connected to MongoDB");
   })
   .catch((error) => {
@@ -18,7 +18,7 @@ mongoose
 
 const recipeSchema = new mongoose.Schema({
   name: {
-    type: String, 
+    type: String,
     minLength: 5,
     required: true
   },
