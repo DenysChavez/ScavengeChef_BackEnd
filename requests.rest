@@ -1,22 +1,25 @@
-GET http://localhost:3001/api/recipes/1
+GET http://localhost:1000/api/recipes/64d6358358eb56e7fb61fce
 
 ###
 
-GET http://localhost:3001/api/recipes
+DELETE http://localhost:1000/api/recipes/64d543e5193d030e99fddb2b
+###
+
+GET http://localhost:1000/api/recipes
 
 ###
 
-GET http://localhost:3001/api/quotes
+GET http://localhost:1000/api/quotes
 
 ###
 
-POST http://localhost:3001/api/recipes
+POST http://localhost:1000/api/recipes
 Content-Type: application/json
 
 {
     "name": "Michito",
-    "ingredients": ["un Micho"],
-    "instructions": ["un dan"],
+    "ingredients": ["un Micho", "Un Dan"],
+    "instructions": ["un dan", "un micho"],
     "category": "micho",
     "image": "lalal"
 }

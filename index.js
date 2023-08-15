@@ -13,15 +13,26 @@ const requestLogger = (request, response, next) => {
   next();
 };
 
-// This middleware will be used for catching requests made to non-existent routes. For these requests, the middleware will return an error message in the JSON format.
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message)
+
+  if (error.name === 'CastError') {
+    return response.status(404).send({error: 'malformatted id'})
+  } else if (error.name === 'ValidationError') {
+    return response.status(400).json({error: error.message})
+  }
+
+  next(error)
+}
+
+// handler of requests with unknown endpoint
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: "unknown endpoint" });
 };
-
-app.use(cors());
-app.use(express.json());
-app.use(requestLogger);
 app.use(express.static("build"));
+app.use(express.json());
+app.use(cors());
+app.use(requestLogger);
 
 let recipes = [
   {
@@ -205,11 +216,6 @@ let quotes = [
   },
 ];
 
-const generateId = () => {
-  const maxId = recipes.length > 0 ? Math.max(...recipes.map((n) => n.id)) : 0;
-  return maxId + 1;
-};
-
 app.get("/info", (request, response) => {
   response.send(`
     <p>Recipe DataBase has ${recipes.length} recipes and ${
@@ -227,28 +233,32 @@ app.get("/api/recipes", (request, response) => {
 });
 
 // FETCH AN INDIVIDUAL RECIPE
-app.get("/api/recipes/:id", (request, response) => {
-  Recipe.findById(request.params.id).then(recipe => {
-    response.json(recipe)
+app.get("/api/recipes/:id", (request, response, next ) => {
+  Recipe.findById(request.params.id)
+    .then(recipe => {
+    if (recipe) {
+      response.json(recipe)
+
+    } else {
+      response.status(404).end()
+    }
   })
+    .catch(error => next(error))
 
 });
 
+// DELETE RECIPE
 app.delete("/api/recipes/:id", (request, response) => {
-  const id = Number(request.params.id);
-  recipes = recipes.filter((recipe) => recipe.id !== id);
-  response.status(204).end();
+  Recipe.findByIdAndRemove(request.params.id)
+    .then(result => {
+      response.status(204).end()
+    })
+    .catch(error => next(error))
 });
 
-// POST
-app.post("/api/recipes", (request, response) => {
+// POST (Save a Recipe)
+app.post("/api/recipes", (request, response, next) => {
   const body = request.body;
-
-  if (!body.name || !body.ingredients || !body.instructions || !body.category) {
-    return response.status(400).json({
-      error: "content missing",
-    });
-  }
 
   const recipe = new Recipe({
     name: body.name,
@@ -261,22 +271,34 @@ app.post("/api/recipes", (request, response) => {
 
   recipe.save().then(savedRecipe => {
     response.json(savedRecipe);
-
-  })
+  }).catch(error => next(error))
 });
 
-app.delete("/api/recipes/:id", (request, response) => {
-  const id = Number(request.params.id);
-  recipes = recipes.filter((recipe) => recipe.id !== id);
 
-  response.status(204).end();
-});
+// Update a Recipe
+app.put("/api/recipes/:id", (request, response, next) => {
+  const {name, ingredients, instructions, category, image, like} = request.body
+
+  Recipe.findByIdAndUpdate(
+    request.params.id,
+    { name, ingredients, instructions, category, image, like },
+    { new: true, runValidation: true, context: 'query'}
+  )
+    .then(updatedNote => {
+      response.json(updatedNote)
+    })
+    .catch(error => next(error))
+})
+
 //   QUOTES
 app.get("/api/quotes", (request, response) => {
   response.json(quotes);
 });
 
+// handler of requests with unknown endpoint
 app.use(unknownEndpoint);
+// handler of requests with result to errors
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
