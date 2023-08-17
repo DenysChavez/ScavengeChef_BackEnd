@@ -7,31 +7,17 @@ recipesRouter.get("/", async (request, response) => {
 });
 
 // FETCH AN INDIVIDUAL RECIPE
-recipesRouter.get("/:id", async (request, response, next) => {
-  try {
-    const recipe = await Recipe.findById(request.params.id)
-    if (recipe) {
-      response.json(recipe)
-    } else {
-      response.status(404).end()
-    }
-  } catch (exception) {
-    next(exception)
+recipesRouter.get("/:id", async (request, response) => {
+  const recipe = await Recipe.findById(request.params.id);
+  if (recipe) {
+    response.json(recipe);
+  } else {
+    response.status(404).end();
   }
-
-  // Recipe.findById(request.params.id)
-  //   .then((recipe) => {
-  //     if (recipe) {
-  //       response.json(recipe);
-  //     } else {
-  //       response.status(404).end();
-  //     }
-  //   })
-  //   .catch((error) => next(error));
 });
 
 // POST (Save a Recipe)
-recipesRouter.post("/", async (request, response, next) => {
+recipesRouter.post("/", async (request, response) => {
   const body = request.body;
 
   const recipe = new Recipe({
@@ -43,28 +29,14 @@ recipesRouter.post("/", async (request, response, next) => {
     like: false,
   });
 
-  try {
-    const savedRecipe = await recipe.save();
-    response.status(201).json(savedRecipe);
-  } catch (exception) {
-    next(exception)
-  }
+  const savedRecipe = await recipe.save();
+  response.status(201).json(savedRecipe);
 });
 
 // DELETE RECIPE
-recipesRouter.delete("/:id", async (request, response, next) => {
-  try {
-    await Recipe.findByIdAndRemove(request.params.id)
-    response.status(204).end()
-  } catch (exception) {
-    next(exception)
-  }
-
-  // Recipe.findByIdAndRemove(request.params.id)
-  //   .then(() => {
-  //     response.status(204).end();
-  //   })
-  //   .catch((error) => next(error));
+recipesRouter.delete("/:id", async (request, response) => {
+  await Recipe.findByIdAndRemove(request.params.id);
+  response.status(204).end();
 });
 
 // Update a Recipe
