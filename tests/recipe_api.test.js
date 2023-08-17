@@ -9,10 +9,9 @@ const Recipe = require("../models/recipe");
 beforeEach(async () => {
   await Recipe.deleteMany({});
 
-  let recipeObj = new Recipe(helper.initialRecipes[0]);
-  await recipeObj.save();
-  recipeObj = new Recipe(helper.initialRecipes[1]);
-  await recipeObj.save();
+  const recipeObject = helper.initialRecipes.map(recipe => new Recipe(recipe))
+  const promiseArray = recipeObject.map(recipe => recipe.save())
+  await Promise.all(promiseArray)
 });
 
 test("are returned as json", async () => {
