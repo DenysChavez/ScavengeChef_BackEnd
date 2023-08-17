@@ -9,14 +9,12 @@ const recipeSchema = new mongoose.Schema({
   ingredients: {
     type: [String],
     validate: function (array) {
-      console.log(array.length);
       return array.length >= 2
     }
   },
   instructions: {
     type: [String],
     validate: function (array) {
-      console.log(array.length);
       return array.length >= 2
     }
   },
