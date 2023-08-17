@@ -1,10 +1,9 @@
 const recipesRouter = require("express").Router();
 const Recipe = require("../models/recipe");
 
-recipesRouter.get("/", (request, response) => {
-  Recipe.find({}).then((recipe) => {
-    response.json(recipe);
-  });
+recipesRouter.get("/", async (request, response) => {
+  const recipes = await Recipe.find({});
+  response.json(recipes);
 });
 
 // FETCH AN INDIVIDUAL RECIPE
@@ -21,7 +20,7 @@ recipesRouter.get("/:id", (request, response, next) => {
 });
 
 // POST (Save a Recipe)
-recipesRouter.post("/", (request, response, next) => {
+recipesRouter.post("/", async (request, response, next) => {
   const body = request.body;
 
   const recipe = new Recipe({
@@ -33,12 +32,19 @@ recipesRouter.post("/", (request, response, next) => {
     like: false,
   });
 
-  recipe
-    .save()
-    .then((savedRecipe) => {
-      response.json(savedRecipe);
-    })
-    .catch((error) => next(error));
+  try {
+    const savedRecipe = await recipe.save();
+    response.status(201).json(savedRecipe);
+  } catch (exception) {
+    next(exception)
+  }
+
+  // recipe
+  //   .save()
+  //   .then((savedRecipe) => {
+  //     response.status(201).json(savedRecipe);
+  //   })
+  //   .catch((error) => next(error));
 });
 
 // DELETE RECIPE
@@ -66,4 +72,4 @@ recipesRouter.put("/:id", (request, response, next) => {
     .catch((error) => next(error));
 });
 
-module.exports = recipesRouter
+module.exports = recipesRouter;
