@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const supertest = require("supertest");
-const helper = require("./test_helper")
+const helper = require("./test_helper");
 const app = require("../app");
 const api = supertest(app);
 const Recipe = require("../models/recipe");
@@ -75,8 +75,8 @@ test("a valid recipe can be added", async () => {
     .expect(201)
     .expect("Content-Type", /application\/json/);
 
-  const recipesAtEnd = await helper.recipeInDb()
-  expect(recipesAtEnd).toHaveLength(helper.initialRecipes.length + 1)
+  const recipesAtEnd = await helper.recipeInDb();
+  expect(recipesAtEnd).toHaveLength(helper.initialRecipes.length + 1);
 
   const names = recipesAtEnd.map((r) => r.name);
   expect(names).toContain("Vegetable Quinoa Stir-Fry");
@@ -100,13 +100,37 @@ test("recipe without ingredients is not added", async () => {
     like: false,
   };
 
-  await api
-    .post("/api/recipes")
-    .send(newRecipe)
-    .expect(400);
+  await api.post("/api/recipes").send(newRecipe).expect(400);
 
-  const recipesAtEnd = await helper.recipeInDb()
+  const recipesAtEnd = await helper.recipeInDb();
   expect(recipesAtEnd).toHaveLength(helper.initialRecipes.length);
+});
+
+test("a specific recipe can be viewed", async () => {
+  const recipeAtStart = await helper.recipeInDb();
+
+  const recipeToView = recipeAtStart[0];
+
+  const resultRecipe = await api
+    .get(`/api/recipes/${recipeToView.id}`)
+    .expect(200)
+    .expect("Content-Type", /application\/json/);
+
+  expect(resultRecipe.body).toEqual(recipeToView);
+});
+
+test("a recipe can be deleted", async () => {
+  const recipeAtStart = await helper.recipeInDb();
+
+  const recipeToDelete = recipeAtStart[0];
+
+  await api.delete(`/api/recipes/${recipeToDelete.id}`).expect(204);
+
+  const recipeAtEnd = await helper.recipeInDb();
+  expect(recipeAtEnd).toHaveLength(helper.initialRecipes.length - 1);
+
+  const names = recipeAtEnd.map((r) => r.name);
+  expect(names).not.toContain(recipeToDelete.name);
 });
 
 afterAll(async () => {
