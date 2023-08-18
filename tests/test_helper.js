@@ -59,16 +59,23 @@ const initialRecipes = [
 ];
 
 const nonExistingId = async () => {
-  const recipe = new Recipe({ name: "Micho Bonito Preciosito" });
+  const recipe = new Recipe({
+    name: "Micho Bonito Preciosito",
+    ingredients: ["Un Micho", "Un Dan"],
+    instructions: ["Mix them", "So much Love"],
+    category: "family",
+    image: "lalala.jpg",
+    like: false,
+  });
   await recipe.save();
   await recipe.deleteOne();
 
-  return recipe._id.toString();
+  return recipe.id.toString();
 };
 
 const recipeInDb = async () => {
   const recipes = await Recipe.find({});
-  return recipes.map(note => note.toJSON())
+  return recipes.map((note) => note.toJSON());
 };
 
 module.exports = {
