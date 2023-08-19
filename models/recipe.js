@@ -21,6 +21,10 @@ const recipeSchema = new mongoose.Schema({
   category: String,
   image: String,
   like: Boolean,
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }
 });
 
 recipeSchema.set("toJSON", {
