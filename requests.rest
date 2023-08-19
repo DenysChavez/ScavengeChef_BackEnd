@@ -23,3 +23,14 @@ Content-Type: application/json
     "category": "micho",
     "image": "lalal"
 }
+
+### 
+
+POST http://localhost:1000/api/users
+Content-Type: application/json
+
+{
+    "username": "root",
+    "name": "Superuser",
+    "password": "salainen"
+}
