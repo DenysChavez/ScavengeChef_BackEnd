@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const uniqueValidator = require('mongoose-unique-validator')
 
-const userSchema = mongoose.Schema({
+const userSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
@@ -12,7 +12,7 @@ const userSchema = mongoose.Schema({
   recipes: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      recipe: 'Recipe'
+      ref: 'Recipe'
     }
   ],
 })
