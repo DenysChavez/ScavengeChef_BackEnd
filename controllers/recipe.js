@@ -1,5 +1,6 @@
 const recipesRouter = require("express").Router();
 const Recipe = require("../models/recipe");
+const User = require('../models/user')
 
 recipesRouter.get("/", async (request, response) => {
   const recipes = await Recipe.find({});
@@ -19,6 +20,7 @@ recipesRouter.get("/:id", async (request, response) => {
 // POST (Save a Recipe)
 recipesRouter.post("/", async (request, response) => {
   const body = request.body;
+  const user = await User.findById(body.userId)
 
   const recipe = new Recipe({
     name: body.name,
@@ -27,10 +29,14 @@ recipesRouter.post("/", async (request, response) => {
     category: body.category,
     image: body.image,
     like: false,
+    user: user.id
   });
 
   const savedRecipe = await recipe.save();
-  response.status(201).json(savedRecipe);
+  user.recipes = user.recipes.concat(savedRecipe._id)
+  await user.save()
+
+  response.json(savedRecipe);
 });
 
 // DELETE RECIPE
