@@ -15,9 +15,10 @@ GET http://localhost:1000/api/quotes
 
 POST http://localhost:1000/api/recipes
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImRhbmJyb2giLCJpZCI6IjY0ZTI3MjUzZGM1MDllN2Y5NzkyZjk4NyIsImlhdCI6MTY5MjU2NjAyNn0.yhBlgI7gKQ5ocsBFpuc8zIvCljhxGR-qM06Z_P_u57E
 
 {
-    "name": "Pozole de Pollo",
+    "name": "Caldito de Pollo",
     "ingredients": [
       "2 cups dried hominy corn",
       "1 kg pork shoulder, cubed",
@@ -43,8 +44,7 @@ Content-Type: application/json
       "Enjoy your delicious Pozole!"
     ],
     "category": "Main Dish",
-    "image": "https://img.sndimg.com/food/image/upload/f_auto,c_thumb,q_55,w_860,ar_3:2/v1/img/recipes/19/62/33/sobU9LjR3qh8ul37iAvw_pork-pozole-7704.jpg",
-    "userId": "64e27253dc509e7f9792f987"
+    "image": "https://img.sndimg.com/food/image/upload/f_auto,c_thumb,q_55,w_860,ar_3:2/v1/img/recipes/19/62/33/sobU9LjR3qh8ul37iAvw_pork-pozole-7704.jpg"
 }
 
 ### 
@@ -60,3 +60,12 @@ Content-Type: application/json
 
 ###
 GET http://localhost:1000/api/users
+
+###
+POST http://localhost:1000/api/login
+Content-Type: application/json
+
+{
+  "username": "danbroh",
+  "password": "danBonito"
+}

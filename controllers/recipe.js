@@ -1,6 +1,7 @@
 const recipesRouter = require("express").Router();
 const Recipe = require("../models/recipe");
 const User = require('../models/user')
+const jwt = require('jsonwebtoken')
 
 recipesRouter.get("/", async (request, response) => {
   const recipes = await Recipe.find({}).populate('user', { username: 1 })
@@ -18,9 +19,22 @@ recipesRouter.get("/:id", async (request, response) => {
 });
 
 // POST (Save a Recipe)
+const getTokenFrom = request => {
+  const authorization = request.get('authorization')
+  if (authorization && authorization.startsWith('Bearer ')) {
+    return authorization.replace('Bearer ', '')
+  }
+  return null
+}
+
 recipesRouter.post("/", async (request, response) => {
   const body = request.body;
-  const user = await User.findById(body.userId)
+
+  const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: 'token invalid' })
+  }
+  const user = await User.findById(decodedToken.id)
 
   const recipe = new Recipe({
     name: body.name,
